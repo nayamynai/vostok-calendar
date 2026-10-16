@@ -323,4 +323,8 @@ body, html {
         left: 0;
         right: 0;
     }
+    .info-card, .site-header {
+        backdrop-filter: none;
+        background: rgba(34, 53, 76, 0.92);
+    }
 }
