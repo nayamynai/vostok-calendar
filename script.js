@@ -47,12 +47,11 @@ for (let i = 0; i < totalSeasons; i++) {
 
     const currentSeasonName = seasons[i];
 
-    // Логика клика (идеально для телефонов / тач-устройств)
+    // Обработка взаимодействия (подсветка с 1-го раза, переход со 2-го)
     sector.addEventListener('click', (e) => {
-        // Проверяем, мобильное ли это устройство (или клик без наведения)
-        // Если сектор еще не выбран или кликнули по другому:
+        // Проверяем: если это мобильное устройство или клик без предварительного hover
         if (selectedSector !== sector) {
-            e.preventDefault(); // Предотвращаем переход при первом клике
+            e.preventDefault(); // ВСЕГДА отменяем первый переход
 
             if (selectedSector) {
                 selectedSector.classList.remove('active-sector');
@@ -60,22 +59,25 @@ for (let i = 0; i < totalSeasons; i++) {
             selectedSector = sector;
             sector.classList.add('active-sector');
 
-            // Обновляем текст в центре
+            // Показываем текст в центре
             seasonTitle.textContent = currentSeasonName;
             seasonDesc.textContent = `Сезон #${i + 1} из 24 (Нажмите еще раз для открытия)`;
+            
+            return false; // Блокируем дальнейшее действие
         } else {
-            // Второй клик по уже выбранному секторе — разрешаем переход по ссылке (href)
-            return true; 
+            // Второй клик по уже выбранному сектору — разрешаем переход
+            window.location.href = sector.href;
         }
     });
 
-    // Логика наведения (для компьютеров с мышкой)
+    // Наведение для компьютеров (мышка)
     sector.addEventListener('mouseenter', () => {
-        // На ПК наведение работает независимо и мгновенно меняет текст/подсветку
-        seasonTitle.textContent = currentSeasonName;
-        seasonDesc.textContent = `Сезон #${i + 1} из 24`;
+        // На ПК наведение работает сразу, если на телефоне ничего принудительно не закреплено
+        if (!selectedSector) {
+            seasonTitle.textContent = currentSeasonName;
+            seasonDesc.textContent = `Сезон #${i + 1} из 24`;
+        }
     });
-
     // Убираем подсветку при уходе мыши с ПК (если на телефоне ничего не зафиксировано)
     sector.addEventListener('mouseleave', () => {
         if (!selectedSector) {
