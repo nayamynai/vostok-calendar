@@ -1,0 +1,235 @@
+:root {
+    --gold-primary: #d4af37;
+    --gold-light: #fbe390;
+    --card-bg: rgba(40, 63, 90, 0.7);
+    --card-border: rgba(212, 175, 55, 0.35);
+    --card-accent: rgba(212, 175, 55, 0.15);
+    --text-main: #ffffff;
+    --text-muted: #d1dce5;
+}
+
+/* Смягченные мягко-светящиеся градиенты под сезоны */
+body.spring {
+    --primary-color: #f092b0;
+    --bg-gradient: radial-gradient(circle at 50% 25%, #56394c 0%, #22354c 60%, #152232 100%);
+    --card-border: rgba(240, 146, 176, 0.38);
+    --card-accent: rgba(240, 146, 176, 0.15);
+}
+
+body.summer {
+    --primary-color: #62b380;
+    --bg-gradient: radial-gradient(circle at 50% 25%, #2e5944 0%, #22354c 60%, #152232 100%);
+    --card-border: rgba(98, 179, 128, 0.38);
+    --card-accent: rgba(98, 179, 128, 0.15);
+}
+
+body.autumn {
+    --primary-color: #e59356;
+    --bg-gradient: radial-gradient(circle at 50% 25%, #61402d 0%, #22354c 60%, #152232 100%);
+    --card-border: rgba(229, 147, 86, 0.38);
+    --card-accent: rgba(229, 147, 86, 0.15);
+}
+
+body.winter {
+    --primary-color: #72a8e2;
+    --bg-gradient: radial-gradient(circle at 50% 25%, #32577d 0%, #22354c 60%, #152232 100%);
+    --card-border: rgba(114, 168, 226, 0.38);
+    --card-accent: rgba(114, 168, 226, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    width: 100%;
+    min-height: 100vh;
+    font-family: "PingFang SC", "STHeiti", "Georgia", serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    line-height: 1.8;
+}
+
+.season-wrapper {
+    max-width: 680px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 50px 0 80px 0;
+}
+
+.season-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.season-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    background: rgba(23, 36, 51, 0.88);
+    padding: 6px 20px;
+    border-radius: 30px;
+    border: 1px solid var(--primary-color);
+    margin-bottom: 15px;
+    box-shadow: 0 0 15px var(--card-accent);
+}
+
+h1 {
+    font-size: 32px;
+    color: #ffffff;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.season-subtitle {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    padding: 30px 34px;
+    border-radius: 18px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+    margin-bottom: 25px;
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 20px var(--card-accent);
+    border-color: var(--primary-color);
+    background-color: rgba(31, 48, 67, 0.92);
+}
+
+.card h3 {
+    font-size: 19px;
+    color: var(--primary-color);
+    margin-bottom: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+ul li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 14px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+ul li strong {
+    color: #ffffff;
+}
+
+ul li::before {
+    content: "✦";
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+    font-size: 12px;
+    top: 2px;
+}
+
+.back-link-wrapper {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.back-link {
+    display: inline-block;
+    color: var(--gold-light);
+    background: rgba(23, 36, 51, 0.88);
+    padding: 12px 32px;
+    border-radius: 30px;
+    text-decoration: none;
+    border: 1px solid var(--card-border);
+    transition: all 0.3s ease;
+    font-size: 13.5px;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.back-link:hover {
+    background: var(--gold-primary);
+    color: #0d1520;
+    border-color: var(--gold-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+    font-weight: 600;
+}
+
+/* Контейнер для падающих частиц (анимации на фоне) */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0; /* Располагается поверх фона, но под текстом */
+    overflow: hidden;
+}
+
+/* Базовый класс для отдельной частицы */
+.particle {
+    position: absolute;
+    top: -10vh;
+    user-select: none;
+    pointer-events: none;
+    animation-name: fall, sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+    opacity: 0.75;
+}
+
+/* Анимация падения вниз */
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+    }
+}
+
+/* Плавное покачивание из стороны в сторону */
+@keyframes sway {
+    0%, 100% {
+        margin-left: 0px;
+    }
+    50% {
+        margin-left: 50px;
+    }
+}
+
+/* Убедимся, что контент страниц находится поверх анимации */
+.season-wrapper {
+    position: relative;
+    z-index: 2;
+}

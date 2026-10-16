@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дыхание Времен — Восточный календарь и 24 сезона</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Шапка -->
+        <header class="site-header">
+            <div class="logo">
+                <span class="logo-icon">时</span>
+                <span class="logo-text">Дыхание Времен</span>
+            </div>
+            
+            <div class="intro-content">
+                <h1>Мудрость циклов восточного календаря</h1>
+                <p>Познайте ритмы природы, сменяющие друг друга. 24 китайских сезона – ваш путеводитель по законам гармонии, времени и энергии.</p>
+            </div>
+        </header>
+
+        <!-- Круг сезонов -->
+        <div class="interactive-stage">
+            <div class="zodiac-ring-wrapper" id="zodiacRing"></div>
+
+            <div class="seasons-wheel-container">
+                <div class="seasons-wheel" id="seasonsWheel"></div>
+                
+                <div class="center-hub" id="centerHub">
+                    <h2 id="seasonTitle">Сезон</h2>
+                    <p id="seasonDesc">Наведите на сектор</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Три блока под кругом -->
+        <section class="info-blocks-section">
+            <div class="info-card" onclick="alert('Раздел «Сегодня» в разработке')">
+                <div class="card-icon">☀️</div>
+                <h3 id="todayCardTitle">Сегодня</h3>
+                <p id="todayCardDesc">Загрузка данных текущего дня...</p>
+                <span class="card-link">Советы на сегодня →</span>
+            </div>
+
+           <a href="calendar-2027.html" class="info-card">
+    <div class="card-icon">📅</div>
+    <h3>Календарь 2027</h3>
+    <p>Полный лунно-солнечный календарь на 2027 год с отмеченными 24 солнечными сезонами и традиционными праздниками.</p>
+    <span class="card-link">Открыть календарь →</span>
+</a>
+
+            <div class="info-card" onclick="alert('Раздел «Праздники» в разработке')">
+                <div class="card-icon">🏮</div>
+                <h3>Праздники</h3>
+                <p>Традиционные восточные праздники (Праздник Весны, Цинмин, Середина Осени) и их обычаи.</p>
+                <span class="card-link">Познать мудрость →</span>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="segodnya-widget.js"></script>
+    
+</body>
+</html>
