@@ -173,6 +173,10 @@ body, html {
     transition: background 0.3s ease;
     clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
 }
+.season-sector.active-sector {
+    filter: brightness(1.25);
+    outline: 2px solid var(--gold-primary, #d4af37);
+}
 
 .season-sector:hover {
     background: rgba(212, 175, 55, 0.35);
@@ -305,4 +309,18 @@ body, html {
 .info-card:hover .card-link {
     gap: 10px;
     text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+@media (max-width: 600px) {
+    /* Уменьшаем и аккуратно масштабируем всё колесо целиком на экранах телефонов */
+    .interactive-stage {
+        transform: scale(0.55);
+        transform-origin: center center;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: -40px auto; /* компенсируем образовавшиеся от масштабирования пустые отступы */
+        left: 0;
+        right: 0;
+    }
 }

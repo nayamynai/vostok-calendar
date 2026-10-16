@@ -36,11 +36,8 @@ const seasonDesc = document.getElementById('seasonDesc');
 const totalSeasons = 24;
 
 for (let i = 0; i < totalSeasons; i++) {
-    // Создаем тег ссылки <a> вместо обычного div, чтобы открывать новую вкладку
     const sector = document.createElement('a');
     sector.className = 'season-sector';
-    
-    // Ссылки будут вести на файлы вида season-1.html, season-2.html и т.д.
     sector.href = `season${i + 1}.html`;
     
     const angle = (i * (360 / totalSeasons)) - 7.5;
@@ -50,10 +47,42 @@ for (let i = 0; i < totalSeasons; i++) {
 
     const currentSeasonName = seasons[i];
 
-    // Интерактив при наведении
+    // Логика клика (идеально для телефонов / тач-устройств)
+    sector.addEventListener('click', (e) => {
+        // Проверяем, мобильное ли это устройство (или клик без наведения)
+        // Если сектор еще не выбран или кликнули по другому:
+        if (selectedSector !== sector) {
+            e.preventDefault(); // Предотвращаем переход при первом клике
+
+            if (selectedSector) {
+                selectedSector.classList.remove('active-sector');
+            }
+            selectedSector = sector;
+            sector.classList.add('active-sector');
+
+            // Обновляем текст в центре
+            seasonTitle.textContent = currentSeasonName;
+            seasonDesc.textContent = `Сезон #${i + 1} из 24 (Нажмите еще раз для открытия)`;
+        } else {
+            // Второй клик по уже выбранному секторе — разрешаем переход по ссылке (href)
+            return true; 
+        }
+    });
+
+    // Логика наведения (для компьютеров с мышкой)
     sector.addEventListener('mouseenter', () => {
+        // На ПК наведение работает независимо и мгновенно меняет текст/подсветку
         seasonTitle.textContent = currentSeasonName;
-        seasonDesc.textContent = `Сезон #${i + 1} из 24 (Кликните для перехода)`;
+        seasonDesc.textContent = `Сезон #${i + 1} из 24`;
+    });
+
+    // Убираем подсветку при уходе мыши с ПК (если на телефоне ничего не зафиксировано)
+    sector.addEventListener('mouseleave', () => {
+        if (!selectedSector) {
+            // Возвращаем дефолтный текст, если ничего не выбрано
+            seasonTitle.textContent = "24 Солнечных Сезона";
+            seasonDesc.textContent = "Выберите сезон на колесе";
+        }
     });
 
     seasonsWheel.appendChild(sector);
