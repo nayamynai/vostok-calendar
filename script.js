@@ -35,7 +35,7 @@ const seasonTitle = document.getElementById('seasonTitle');
 const seasonDesc = document.getElementById('seasonDesc');
 const totalSeasons = 24;
 
-let selectedSector = null; // Переменная для выбранного сектора
+let selectedSector = null; // Для мобильных устройств
 
 for (let i = 0; i < totalSeasons; i++) {
     const sector = document.createElement('div');
@@ -50,7 +50,7 @@ for (let i = 0; i < totalSeasons; i++) {
 
     const currentSeasonName = seasons[i];
 
-    // Клик (для телефонов и выбор на ПК)
+    // Клик (выбор для мобильных / открытие)
     sector.addEventListener('click', () => {
         if (selectedSector !== sector) {
             if (selectedSector) {
@@ -68,20 +68,10 @@ for (let i = 0; i < totalSeasons; i++) {
         }
     });
 
-    // Наведение мыши (возвращаем для ПК)
+    // Наведение мыши (для ПК — всегда обновляет центр)
     sector.addEventListener('mouseenter', () => {
-        if (!selectedSector) {
-            seasonTitle.textContent = currentSeasonName;
-            seasonDesc.textContent = `Сезон #${i + 1} из 24`;
-        }
-    });
-
-    // Уход мыши (возвращаем для ПК)
-    sector.addEventListener('mouseleave', () => {
-        if (!selectedSector) {
-            seasonTitle.textContent = "24 Солнечных Сезона";
-            seasonDesc.textContent = "Наведите на сектор";
-        }
+        seasonTitle.textContent = currentSeasonName;
+        seasonDesc.textContent = `Сезон #${i + 1} из 24`;
     });
 
     seasonsWheel.appendChild(sector);
