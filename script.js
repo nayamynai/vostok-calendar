@@ -35,10 +35,13 @@ const seasonTitle = document.getElementById('seasonTitle');
 const seasonDesc = document.getElementById('seasonDesc');
 const totalSeasons = 24;
 
+let selectedSector = null; // Переменная для выбранного сектора
+
 for (let i = 0; i < totalSeasons; i++) {
-    const sector = document.createElement('a');
+    const sector = document.createElement('div');
     sector.className = 'season-sector';
-    sector.href = `season${i + 1}.html`;
+    
+    const seasonUrl = `season${i + 1}.html`;
     
     const angle = (i * (360 / totalSeasons)) - 7.5;
     sector.style.transform = `rotate(${angle}deg)`;
@@ -47,12 +50,9 @@ for (let i = 0; i < totalSeasons; i++) {
 
     const currentSeasonName = seasons[i];
 
-    // Обработка взаимодействия (подсветка с 1-го раза, переход со 2-го)
-    sector.addEventListener('click', (e) => {
-        // Проверяем: если это мобильное устройство или клик без предварительного hover
+    // Клик (для телефонов и выбор на ПК)
+    sector.addEventListener('click', () => {
         if (selectedSector !== sector) {
-            e.preventDefault(); // ВСЕГДА отменяем первый переход
-
             if (selectedSector) {
                 selectedSector.classList.remove('active-sector');
             }
@@ -62,28 +62,25 @@ for (let i = 0; i < totalSeasons; i++) {
             // Показываем текст в центре
             seasonTitle.textContent = currentSeasonName;
             seasonDesc.textContent = `Сезон #${i + 1} из 24 (Нажмите еще раз для открытия)`;
-            
-            return false; // Блокируем дальнейшее действие
         } else {
-            // Второй клик по уже выбранному сектору — разрешаем переход
-            window.location.href = sector.href;
+            // Второй клик — переход
+            window.location.href = seasonUrl;
         }
     });
 
-    // Наведение для компьютеров (мышка)
+    // Наведение мыши (возвращаем для ПК)
     sector.addEventListener('mouseenter', () => {
-        // На ПК наведение работает сразу, если на телефоне ничего принудительно не закреплено
         if (!selectedSector) {
             seasonTitle.textContent = currentSeasonName;
             seasonDesc.textContent = `Сезон #${i + 1} из 24`;
         }
     });
-    // Убираем подсветку при уходе мыши с ПК (если на телефоне ничего не зафиксировано)
+
+    // Уход мыши (возвращаем для ПК)
     sector.addEventListener('mouseleave', () => {
         if (!selectedSector) {
-            // Возвращаем дефолтный текст, если ничего не выбрано
             seasonTitle.textContent = "24 Солнечных Сезона";
-            seasonDesc.textContent = "Выберите сезон на колесе";
+            seasonDesc.textContent = "Наведите на сектор";
         }
     });
 
