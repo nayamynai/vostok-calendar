@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Полный календарь 2027 — Сезоны и праздники</title>
+    <title>Календарь 2027 — Сезоны, праздники, Цзянь Чу и дни Ша</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        :root {
+            --cal-season: #63b3ed;
+            --cal-holiday: #f6ad55;
+            --cal-sha: #ff5c6c;
+        }
+
         .calendar-wrapper {
             max-width: 1400px;
             width: 95%;
@@ -43,36 +49,140 @@
             color: #0d1520;
         }
 
-        /* Легенда */
-        .calendar-legend {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 35px;
-            font-size: 13px;
-            color: var(--text-muted);
-            flex-wrap: wrap;
+        /* ───────── Легенда-фильтр ───────── */
+        .legend {
+            max-width: 1000px;
+            margin: 0 auto 34px;
+            padding: 18px 24px 20px;
+            background: rgba(34, 53, 76, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-        .legend-item {
+        .legend-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px 34px;
+        }
+
+        .lg-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-size: 14px;
+        }
+        .lg-input {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .lg-box {
+            position: relative;
+            flex: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1.5px solid var(--c);
+            overflow: hidden;
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .lg-box::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--bg, var(--c));
+            opacity: 0.2;
+            transition: opacity 0.2s;
+        }
+        .lg-input:checked + .lg-box::before { opacity: 0.95; }
+        .lg-input:focus-visible + .lg-box { box-shadow: 0 0 0 3px rgba(243, 229, 171, 0.55); }
+        .lg-item:active .lg-box { transform: scale(0.9); }
+
+        .lg-check {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.6));
+        }
+        .lg-check path {
+            opacity: 0;
+            stroke-dasharray: 1;
+            stroke-dashoffset: 1;
+            transition: stroke-dashoffset 0.22s ease 0.04s, opacity 0.05s;
+        }
+        .lg-input:checked + .lg-box .lg-check path {
+            opacity: 1;
+            stroke-dashoffset: 0;
+        }
+        .lg-text {
+            color: var(--text-muted, #a0aec0);
+            transition: color 0.2s;
+        }
+        .lg-item:hover .lg-text,
+        .lg-input:checked ~ .lg-text { color: #e2e8f0; }
+
+        .jc-legend {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            transition: opacity 0.25s;
+        }
+        .jc-legend.off { opacity: 0.35; }
+        .jc-legend-title {
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-muted, #a0aec0);
+            margin-bottom: 12px;
+        }
+        .jc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+            gap: 9px 14px;
+        }
+        .jc-chip {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
+            font-size: 12.5px;
+            color: #cbd5e0;
+            white-space: nowrap;
         }
-        .legend-box {
+        .jc-chip b { color: #fff; font-weight: 600; }
+        .jc-chip small { color: var(--text-muted, #a0aec0); font-size: 11.5px; }
+        .jc-sw {
+            flex: none;
             width: 16px;
             height: 16px;
             border-radius: 4px;
+            background: hsl(var(--jh) 70% 58% / 0.34);
+            border: 1px solid hsl(var(--jh) 70% 58% / 0.85);
         }
-        .legend-box.season-box { background: rgba(99, 179, 237, 0.3); border: 1px solid #63b3ed; }
-        .legend-box.holiday-box { background: rgba(246, 173, 85, 0.3); border: 1px solid #f6ad55; }
 
-        /* Сетка месяцев */
+        /* ───────── Сетка месяцев ───────── */
         .months-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
         }
-
         .month-card {
             background: rgba(34, 53, 76, 0.75);
             backdrop-filter: blur(12px);
@@ -81,7 +191,6 @@
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-
         .month-title {
             font-size: 18px;
             color: var(--gold-light, #f3e5ab);
@@ -89,97 +198,290 @@
             text-align: center;
             font-weight: 600;
         }
-
-        /* Таблица календаря (дни недели и числа) */
         .month-table {
             width: 100%;
             border-collapse: collapse;
             text-align: center;
             font-size: 13px;
         }
-
         .month-table th {
-            color: var(--text-muted);
+            color: var(--text-muted, #a0aec0);
             font-weight: 500;
             padding-bottom: 8px;
             font-size: 12px;
         }
-
         .month-table td {
-            padding: 6px 2px;
-            height: 36px;
+            padding: 5px 2px;
+            height: 40px;
             vertical-align: middle;
         }
 
+        /* День */
         .day-cell {
+            position: relative;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 32px;
             width: 32px;
+            height: 32px;
             margin: 0 auto;
+            box-sizing: border-box;
             border-radius: 8px;
+            border: 1px solid transparent;
             background: rgba(20, 32, 48, 0.4);
             color: #cbd5e0;
-            position: relative;
+            font-variant-numeric: tabular-nums;
+            overflow: hidden;
             cursor: default;
-            transition: transform 0.2s;
+            box-shadow: var(--ring-s, 0 0 #0000), var(--ring-h, 0 0 #0000);
+            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
         }
+        .day-cell .num { position: relative; z-index: 1; }
 
-        .day-cell.empty {
-            background: transparent;
-            pointer-events: none;
-        }
-
-        /* Подсветка сезонов (голубой) */
-        .day-cell.season {
-            background: rgba(99, 179, 237, 0.25);
-            border: 1px solid #63b3ed;
+        .show-season .day-cell.has-season {
+            --ring-s: inset 0 0 0 2px var(--cal-season);
+            background: rgba(99, 179, 237, 0.2);
             color: #fff;
-            font-weight: bold;
+            font-weight: 700;
         }
-
-        /* Подсветка праздников (золотой) */
-        .day-cell.holiday {
-            background: rgba(246, 173, 85, 0.3);
-            border: 1px solid #f6ad55;
+        .show-holiday .day-cell.has-holiday {
+            --ring-h: 0 0 0 2px var(--cal-holiday), 0 0 14px rgba(246, 173, 85, 0.5);
+            background: rgba(246, 173, 85, 0.25);
             color: #fff;
-            font-weight: bold;
+            font-weight: 700;
+            cursor: pointer;
         }
-
-        /* Подсказка при наведении (tooltip) */
-        .day-cell:hover::after {
-            content: attr(data-title);
-            position: absolute;
-            bottom: 115%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0d1520;
+        .show-holiday .day-cell.has-holiday:hover,
+        .show-holiday .day-cell.has-holiday:focus-visible {
+            transform: scale(1.1);outline: none;
+        }
+        /* заливка Цзянь Чу — стоит после сезонов/праздников, поэтому перекрывает их фон */
+        .show-jc .day-cell[data-jc] {
+            background: hsl(var(--jh) 70% 58% / 0.34);
+            border-color: hsl(var(--jh) 70% 58% / 0.8);
             color: #fff;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            white-space: nowrap;
-            z-index: 10;
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            pointer-events: none;
         }
 
-        /* Список ключевых событий под сеткой месяца для ясности */
+        /* Маркеры */
+        .mk { display: none; position: absolute; pointer-events: none; }
+        .mk-h {
+            top: 1px;
+            right: 2px;
+            font-size: 9px;
+            line-height: 1;
+            font-style: normal;
+            color: var(--cal-holiday);
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
+        }
+        .mk-sha {
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 11px 11px 0 0;
+            border-color: var(--cal-sha) transparent transparent transparent;
+        }
+        .show-holiday .has-holiday .mk-h { display: block; }
+        .show-sha .has-sha .mk-sha { display: block; }
+
+        /* Список событий месяца */
         .month-events-list {
             margin-top: 12px;
             padding-top: 10px;
             border-top: 1px solid rgba(212, 175, 55, 0.15);
             font-size: 12px;
-            color: var(--text-muted);
+            color: var(--text-muted, #a0aec0);
         }
-        .month-events-list div {
-            margin-bottom: 3px;
+        .month-events-list[hidden] { display: none; }
+        .month-events-list .ev { margin-bottom: 3px; }
+        .ev-season span { color: var(--cal-season); font-weight: 500; }
+        .ev-holiday span { color: var(--cal-holiday); font-weight: 500; }
+        .ev-sha span { color: var(--cal-sha); font-weight: 500; }
+
+        .calendar-note {
+            max-width: 900px;
+            margin: 34px auto 0;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-muted, #a0aec0);
+            opacity: 0.85;
         }
-        .month-events-list span.s { color: #63b3ed; font-weight: 500; }
-        .month-events-list span.h { color: #f6ad55; font-weight: 500; }
+
+        /* ───────── Подсказка ───────── */
+        .tip {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 50;
+            max-width: 270px;
+            padding: 8px 12px;
+            background: #0d1520;
+            color: #e2e8f0;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+            font-size: 12px;
+            line-height: 1.45;
+            pointer-events: none;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.12s, transform 0.12s;
+        }
+        .tip.on { visibility: visible; opacity: 1; transform: none; }
+        .tip .t-head { color: var(--gold-light, #f3e5ab); font-weight: 600; margin-bottom: 4px; }
+        .tip .t-line { display: flex; align-items: baseline; gap: 7px; }
+        .tip .t-line + .t-line { margin-top: 2px; }
+        .tip .t-dot {
+            flex: none;
+            width: 9px;
+            height: 9px;
+            border-radius: 3px;
+            transform: translateY(1px);
+        }
+
+        /* ───────── Окно праздника ───────── */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(5, 10, 18, 0.72);
+            backdrop-filter: blur(4px);
+            animation: m-fade 0.18s ease;
+        }
+        .modal[hidden] { display: none; }
+        .modal-card {
+            position: relative;
+            width: 100%;
+            max-width: 540px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            padding: 28px 28px 24px;
+            background: #1b2b41;
+            color: #e2e8f0;
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: m-pop 0.22s ease;
+        }
+        .modal-close {position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 32px;
+            height: 32px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            color: #cbd5e0;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .modal-close:hover { background: var(--cal-holiday); color: #0d1520; }
+        .modal-close:focus-visible { outline: 2px solid var(--gold-light, #f3e5ab); outline-offset: 2px; }
+
+        .m-head { display: flex; align-items: center; gap: 16px; padding-right: 30px; }
+        .m-zh {
+            flex: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 64px;
+            height: 64px;
+            padding: 0 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(246, 173, 85, 0.5);
+            background: rgba(246, 173, 85, 0.14);
+            color: var(--cal-holiday);
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .m-head h2 {
+            margin: 0 0 4px;
+            font-size: 21px;
+            line-height: 1.25;
+            color: var(--gold-light, #f3e5ab);
+        }
+        .m-date { font-size: 13px; color: var(--text-muted, #a0aec0); }
+
+        .m-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 4px; }
+        .m-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .m-chip .t-dot { width: 9px; height: 9px; border-radius: 3px; }
+        .m-chip.gold { border-color: rgba(246, 173, 85, 0.5); background: rgba(246, 173, 85, 0.12); color: #fbd5a5; }
+        .m-chip.sha { border-color: rgba(255, 92, 108, 0.5); background: rgba(255, 92, 108, 0.12); color: #ffb3bb; }
+
+        .m-body p { margin: 14px 0 0; font-size: 14.5px; line-height: 1.65; color: #d5dde8; }
+        .m-body h3 {
+            margin: 20px 0 8px;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--gold-light, #f3e5ab);
+            font-weight: 600;
+        }
+        .m-body ul { margin: 0; padding: 0; list-style: none; }
+        .m-body li {
+            position: relative;
+            padding: 3px 0 3px 18px;
+            font-size: 14px;
+            line-height: 1.55;
+            color: #d5dde8;
+        }
+        .m-body li::before {
+            content: "";
+            position: absolute;
+            left: 3px;
+            top: 11px;
+            width: 6px;
+            height: 6px;
+            border-radius: 2px;
+            background: var(--cal-holiday);
+        }
+        .m-body .m-note {
+            margin-top: 18px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            border-left: 3px solid var(--cal-season);
+            background: rgba(99, 179, 237, 0.08);
+            font-size: 13px;
+        }
+
+        .show-jc .day-cell { cursor: pointer; }
+.m-body h3.good { color: #68d391; }
+.m-body h3.bad  { color: #ff8a96; }
+.m-body ul.good li::before { background: #68d391; }
+.m-body ul.bad  li::before { background: var(--cal-sha); }
+
+        @keyframes m-fade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes m-pop { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+        @media (max-width: 520px) {
+            .calendar-header h1 { font-size: 26px; }
+            .legend { padding: 16px 16px 18px; }
+            .modal-card { padding: 24px 20px 20px; }
+            .m-zh { min-width: 56px; height: 56px; font-size: 20px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -189,687 +491,545 @@
 
         <div class="calendar-header">
             <h1>Календарь 2027</h1>
-            <p>Полный календарь по месяцам с выделенными 24 солнечными сезонами и традиционными праздниками</p>
+            <p>24 солнечных сезона, традиционные праздники, 12 дней Цзянь Чу и дни Ша — включайте нужные слои в легенде</p>
         </div>
 
-        <!-- Легенда -->
-        <div class="calendar-legend">
-            <div class="legend-item">
-                <div class="legend-box season-box"></div>
-                <span>Солнечный сезон</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-box holiday-box"></div>
-                <span>Традиционный праздник</span>
-            </div>
-        </div>
+        <!-- Легенда: четыре независимых переключателя -->
+        <section class="legend" id="legend" aria-label="Легенда и фильтры календаря">
+            <div class="legend-row">
+                <label class="lg-item">
+                    <input type="checkbox" class="lg-input" data-layer="season" checked>
+                    <span class="lg-box" style="--c: var(--cal-season)">
+                        <svg class="lg-check" viewBox="0 0 20 20" aria-hidden="true"><path pathLength="1" d="M5 10.5 8.6 14 15 6.5"/></svg>
+                    </span>
+                    <span class="lg-text">Солнечный сезон</span>
+                </label>
 
-        <!-- Сетка месяцев -->
-        <div class="months-grid">
+                <label class="lg-item">
+                    <input type="checkbox" class="lg-input" data-layer="holiday" checked>
+                    <span class="lg-box" style="--c: var(--cal-holiday)">
+                        <svg class="lg-check" viewBox="0 0 20 20" aria-hidden="true"><path pathLength="1" d="M5 10.5 8.6 14 15 6.5"/></svg>
+                    </span>
+                    <span class="lg-text">Традиционный праздник</span>
+                </label>
 
-            <!-- ЯНВАРЬ 2027 (1 января — Пятница) -->
-            <div class="month-card">
-                <div class="month-title">Январь 2027</div>
-                <table class="month-table">
-                    <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-                    <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td><div class="day-cell">1</div></td>
-    <td><div class="day-cell">2</div></td>
-    <td><div class="day-cell">3</div></td>
-</tr>
-                    <tr>
-                        <td><div class="day-cell">4</div></td>
-                        <td><div class="day-cell season" data-title="5 января: Малые холода (Сяохань)">5</div></td>
-                        <td><div class="day-cell">6</div></td>
-                        <td><div class="day-cell">7</div></td>
-                        <td><div class="day-cell">8</div></td>
-                        <td><div class="day-cell">9</div></td>
-                        <td><div class="day-cell">10</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">11</div></td>
-                        <td><div class="day-cell">12</div></td>
-                        <td><div class="day-cell">13</div></td>
-                        <td><div class="day-cell">14</div></td>
-                        <td><div class="day-cell">15</div></td>
-                        <td><div class="day-cell">16</div></td>
-                        <td><div class="day-cell">17</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">18</div></td>
-                        <td><div class="day-cell">19</div></td>
-                        <td><div class="day-cell season" data-title="20 января: Большие холода (Дахань)">20</div></td>
-                        <td><div class="day-cell">21</div></td>
-                        <td><div class="day-cell">22</div></td>
-                        <td><div class="day-cell">23</div></td>
-                        <td><div class="day-cell">24</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">25</div></td>
-                        <td><div class="day-cell">26</div></td>
-                        <td><div class="day-cell">27</div></td>
-                        <td><div class="day-cell">28</div></td>
-                        <td><div class="day-cell">29</div></td>
-                        <td><div class="day-cell">30</div></td>
-                        <td><div class="day-cell">31</div></td>
-                    </tr>
-                </table>
-                <div class="month-events-list">
-                    <div><span class="s">5 янв:</span> Малые холода (Сяохань)</div>
-                    <div><span class="s">20 янв:</span> Большие холода (Дахань)</div>
+                <label class="lg-item">
+                    <input type="checkbox" class="lg-input" data-layer="sha" checked>
+                    <span class="lg-box" style="--c: var(--cal-sha)">
+                        <svg class="lg-check" viewBox="0 0 20 20" aria-hidden="true"><path pathLength="1" d="M5 10.5 8.6 14 15 6.5"/></svg>
+                    </span>
+                    <span class="lg-text">День Ша</span>
+                </label>
+
+                <label class="lg-item">
+                    <input type="checkbox" class="lg-input" data-layer="jc" checked>
+                    <span class="lg-box" id="jcBox" style="--c: rgba(255,255,255,0.45)">
+                        <svg class="lg-check" viewBox="0 0 20 20" aria-hidden="true"><path pathLength="1" d="M5 10.5 8.6 14 15 6.5"/></svg>
+                    </span>
+                    <span class="lg-text">Цзянь Чу (建除)</span>
+                </label>
+            </div>
+
+            <div class="jc-legend" id="jcLegend">
+                <div class="jc-legend-title">12 дней Цзянь Чу</div>
+                <div class="jc-grid" id="jcGrid"></div>
+            </div>
+        </section>
+
+        <!-- Сетка месяцев (строится скриптом) -->
+        <div class="months-grid show-season show-holiday show-sha show-jc" id="months"></div>
+
+        <p class="calendar-note">
+            Даты сезонов и лунных праздников указаны по пекинскому времени (UTC+8), как принято в китайском календаре.
+            Дни Цзянь Чу отсчитываются от входа Солнца в «цзе»-сезоны: в день цзе значение повторяется.
+            День Ша — день «месячного Ша» (月煞).
+        </p>
+    </div>
+
+    <div class="tip" id="tip" role="tooltip"></div>
+
+    <div class="modal" id="modal" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+            <button type="button" class="modal-close" id="mClose" aria-label="Закрыть">×</button>
+            <div class="m-head">
+                <div class="m-zh" id="mZh"></div>
+                <div>
+                    <h2 id="mTitle"></h2>
+                    <div class="m-date" id="mDate"></div>
                 </div>
             </div>
-
-            <!-- ФЕВРАЛЬ 2027 (1 февраля — Понедельник) -->
-            <div class="month-card">
-                <div class="month-title">Февраль 2027</div>
-                <table class="month-table">
-                    <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-                    <tr>
-                        <td><div class="day-cell">1</div></td>
-                        <td><div class="day-cell">2</div></td>
-                        <td><div class="day-cell">3</div></td>
-                        <td><div class="day-cell season" data-title="4 февраля: Начало весны (Личунь)">4</div></td>
-                        <td><div class="day-cell">5</div></td>
-                        <td><div class="day-cell">6</div></td>
-                        <td><div class="day-cell">7</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">8</div></td>
-                        <td><div class="day-cell">9</div></td>
-                        <td><div class="day-cell holiday" data-title="10 февраля: Праздник Весны (Китайский Новый год)">10</div></td>
-                        <td><div class="day-cell">11</div></td>
-                        <td><div class="day-cell">12</div></td>
-                        <td><div class="day-cell">13</div></td>
-                        <td><div class="day-cell">14</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">15</div></td>
-                        <td><div class="day-cell">16</div></td>
-                        <td><div class="day-cell">17</div></td>
-                        <td><div class="day-cell">18</div></td>
-                        <td><div class="day-cell season" data-title="19 февраля: Дождевая вода (Юйшуй)">19</div></td>
-                        <td><div class="day-cell">20</div></td>
-                        <td><div class="day-cell">21</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">22</div></td>
-                        <td><div class="day-cell">23</div></td>
-                        <td><div class="day-cell">24</div></td>
-                        <td><div class="day-cell">25</div></td>
-                        <td><div class="day-cell">26</div></td>
-                        <td><div class="day-cell">27</div></td>
-                        <td><div class="day-cell">28</div></td>
-                    </tr>
-                </table>
-                <div class="month-events-list">
-                    <div><span class="s">4 фев:</span> Начало весны (Личунь)</div>
-                    <div><span class="h">10 фев:</span> Праздник Весны (Чуньцзе)</div>
-                    <div><span class="s">19 фев:</span> Дождевая вода (Юйшуй)</div>
-                </div>
-            </div>
-
-            <!-- МАРТ 2027 (1 марта — Понедельник) -->
-            <div class="month-card">
-                <div class="month-title">Март 2027</div>
-                <table class="month-table">
-                    <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-                    <tr>
-                        <td><div class="day-cell">1</div></td>
-                        <td><div class="day-cell">2</div></td>
-                        <td><div class="day-cell">3</div></td>
-                        <td><div class="day-cell">4</div></td>
-                        <td><div class="day-cell season" data-title="5 марта: Пробуждение насекомых (Цзинчжэ)">5</div></td>
-                        <td><div class="day-cell">6</div></td>
-                        <td><div class="day-cell">7</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">8</div></td>
-                        <td><div class="day-cell">9</div></td>
-                        <td><div class="day-cell">10</div></td>
-                        <td><div class="day-cell">11</div></td>
-                        <td><div class="day-cell">12</div></td>
-                        <td><div class="day-cell">13</div></td>
-                        <td><div class="day-cell">14</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">15</div></td>
-                        <td><div class="day-cell">16</div></td>
-                        <td><div class="day-cell">17</div></td>
-                        <td><div class="day-cell">18</div></td>
-                        <td><div class="day-cell">19</div></td>
-                        <td><div class="day-cell season" data-title="20 марта: День весеннего равноденствия (Чуньфэнь)">20</div></td>
-                        <td><div class="day-cell">21</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">22</div></td>
-                        <td><div class="day-cell">23</div></td>
-                        <td><div class="day-cell">24</div></td>
-                        <td><div class="day-cell">25</div></td>
-                        <td><div class="day-cell">26</div></td>
-                        <td><div class="day-cell">27</div></td>
-                        <td><div class="day-cell">28</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">29</div></td>
-                        <td><div class="day-cell">30</div></td>
-                        <td><div class="day-cell">31</div></td>
-                        <td colspan="4"></td>
-                    </tr>
-                </table>
-                <div class="month-events-list">
-                    <div><span class="s">5 мар:</span> Пробуждение насекомых (Цзинчжэ)</div>
-                    <div><span class="s">20 мар:</span> Весеннее равноденствие (Чуньфэнь)</div>
-                    </div>
-            </div>
-
-            <!-- АПРЕЛЬ 2027 (1 апреля — Четверг) -->
-            <div class="month-card">
-    <div class="month-title">Апрель 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-            <td><div class="day-cell">2</div></td>
-            <td><div class="day-cell">3</div></td>
-            <td><div class="day-cell holiday" data-title="4 апреля: Праздник Цинмин (поминание предков)">4</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">5</div></td>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell">7</div></td>
-            <td><div class="day-cell">8</div></td>
-            <td><div class="day-cell">9</div></td>
-            <td><div class="day-cell">10</div></td>
-            <td><div class="day-cell">11</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">12</div></td>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell">15</div></td>
-            <td><div class="day-cell">16</div></td>
-            <td><div class="day-cell">17</div></td>
-            <td><div class="day-cell">18</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">19</div></td>
-            <td><div class="day-cell season" data-title="20 апреля: Хлебные дожжи (Гуюй)">20</div></td>
-            <td><div class="day-cell">21</div></td>
-            <td><div class="day-cell">22</div></td>
-            <td><div class="day-cell">23</div></td>
-            <td><div class="day-cell">24</div></td>
-            <td><div class="day-cell">25</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">26</div></td>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-            <td><div class="day-cell">30</div></td>
-            <td colspan="2"></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="h">4 апр:</span> Праздник Цинмин (предки)</div>
-        <div><span class="s">20 апр:</span> Хлебные дожжи (Гуюй)</div>
-    </div>
-</div>
-
-            <!-- МАЙ 2027 (1 мая — Суббота) -->
-            <div class="month-card">
-    <div class="month-title">Май 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td><td></td><td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-            <td><div class="day-cell">2</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">3</div></td>
-            <td><div class="day-cell">4</div></td>
-            <td><div class="day-cell season" data-title="5 мая: Начало лета (Лися)">5</div></td>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell">7</div></td>
-            <td><div class="day-cell">8</div></td>
-            <td><div class="day-cell">9</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">10</div></td>
-            <td><div class="day-cell">11</div></td>
-            <td><div class="day-cell">12</div></td>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell">15</div></td>
-            <td><div class="day-cell">16</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">17</div></td>
-            <td><div class="day-cell">18</div></td>
-            <td><div class="day-cell">19</div></td>
-            <td><div class="day-cell">20</div></td>
-            <td><div class="day-cell season" data-title="21 мая: Малые зерна (Сяомань)">21</div></td>
-            <td><div class="day-cell">22</div></td>
-            <td><div class="day-cell">23</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">24</div></td>
-            <td><div class="day-cell">25</div></td>
-            <td><div class="day-cell">26</div></td>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-            <td><div class="day-cell">30</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">31</div></td>
-            <td colspan="6"></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="s">5 мая:</span> Начало лета (Лися)</div>
-        <div><span class="s">21 мая:</span> Малые зерна (Сяомань)</div>
-    </div>
-</div>
-
-            <!-- ИЮНЬ 2027 (1 июня — Вторник) -->
-            <div class="month-card">
-                <div class="month-title">Июнь 2027</div>
-                <table class="month-table">
-                    <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-                    <tr>
-                        <td class="day-cell empty"></td>
-                        <td><div class="day-cell">1</div></td>
-                        <td><div class="day-cell">2</div></td>
-                        <td><div class="day-cell">3</div></td>
-                        <td><div class="day-cell">4</div></td>
-                        <td><div class="day-cell season" data-title="5 июня: Семена на полях (Манчжун)">5</div></td>
-                        <td><div class="day-cell">6</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">7</div></td>
-                        <td><div class="day-cell">8</div></td>
-                        <td><div class="day-cell holiday" data-title="9 июня: Праздник Дуаньу (Драконьи лодки)">9</div></td>
-                        <td><div class="day-cell">10</div></td>
-                        <td><div class="day-cell">11</div></td>
-                        <td><div class="day-cell">12</div></td>
-                        <td><div class="day-cell">13</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">14</div></td>
-                        <td><div class="day-cell">15</div></td>
-                        <td><div class="day-cell">16</div></td>
-                        <td><div class="day-cell">17</div></td>
-                        <td><div class="day-cell">18</div></td>
-                        <td><div class="day-cell">19</div></td>
-                        <td><div class="day-cell">20</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">14</div></td>
-                        <td><div class="day-cell">15</div></td>
-                        <td><div class="day-cell">16</div></td>
-                        <td><div class="day-cell">17</div></td>
-                        <td><div class="day-cell">18</div></td>
-                        <td><div class="day-cell">19</div></td>
-                        <td><div class="day-cell">20</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell season" data-title="21 июня: День летнего солнцестояния (Сячжи)">21</div></td>
-                        <td><div class="day-cell">22</div></td>
-                        <td><div class="day-cell">23</div></td>
-                        <td><div class="day-cell">24</div></td>
-                        <td><div class="day-cell">25</div></td>
-                        <td><div class="day-cell">26</div></td>
-                        <td><div class="day-cell">27</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">28</div></td>
-                        <td><div class="day-cell">29</div></td>
-                        <td><div class="day-cell">30</div></td>
-                        <td colspan="4"></td>
-                    </tr>
-                </table>
-                <div class="month-events-list">
-                    <div><span class="s">5 июн:</span> Семена на полях (Манчжун)</div>
-                    <div><span class="h">9 июн:</span> Праздник Дуаньу (Лодки)</div>
-                    <div><span class="s">21 июн:</span> Летнее солнцестояние (Сячжи)</div>
-                </div>
-            </div>
-
-            <!-- ИЮЛЬ 2027 (1 июля — Четверг) -->
-           <div class="month-card">
-    <div class="month-title">Июль 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-            <td><div class="day-cell">2</div></td>
-            <td><div class="day-cell">3</div></td>
-            <td><div class="day-cell">4</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">5</div></td>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell season" data-title="7 июля: Малая жара (Сяошу)">7</div></td>
-            <td><div class="day-cell">8</div></td>
-            <td><div class="day-cell">9</div></td>
-            <td><div class="day-cell">10</div></td>
-            <td><div class="day-cell">11</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">12</div></td>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell">15</div></td>
-            <td><div class="day-cell">16</div></td>
-            <td><div class="day-cell">17</div></td>
-            <td><div class="day-cell">18</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">19</div></td>
-            <td><div class="day-cell">20</div></td>
-            <td><div class="day-cell">21</div></td>
-            <td><div class="day-cell season" data-title="22 июля: Большая жара (Дашу)">22</div></td>
-            <td><div class="day-cell">23</div></td>
-            <td><div class="day-cell">24</div></td>
-            <td><div class="day-cell">25</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">26</div></td>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-            <td><div class="day-cell">30</div></td>
-            <td><div class="day-cell">31</div></td>
-            <td></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="s">7 июл:</span> Малая жара (Сяошу)</div>
-        <div><span class="s">22 июл:</span> Большая жара (Дашу)</div>
-    </div>
-</div>
-            <!-- АВГУСТ 2027 (1 августа — Воскресенье) -->
-           <div class="month-card">
-    <div class="month-title">Август 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td><td></td><td></td><td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">2</div></td>
-            <td><div class="day-cell">3</div></td>
-            <td><div class="day-cell">4</div></td>
-            <td><div class="day-cell">5</div></td>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell season" data-title="7 августа: Начало осени (Лицюм)">7</div></td>
-            <td><div class="day-cell">8</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">9</div></td>
-            <td><div class="day-cell">10</div></td>
-            <td><div class="day-cell">11</div></td>
-            <td><div class="day-cell">12</div></td>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell">15</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">16</div></td>
-            <td><div class="day-cell">17</div></td>
-            <td><div class="day-cell">18</div></td>
-            <td><div class="day-cell">19</div></td>
-            <td><div class="day-cell">20</div></td>
-            <td><div class="day-cell">21</div></td>
-            <td><div class="day-cell season" data-title="22 августа: Предел жары (Чушу)">22</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">23</div></td>
-            <td><div class="day-cell">24</div></td>
-            <td><div class="day-cell">25</div></td>
-            <td><div class="day-cell">26</div></td>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">30</div></td>
-            <td><div class="day-cell">31</div></td>
-            <td colspan="5"></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="s">7 авг:</span> Начало осени (Лицюм)</div>
-        <div><span class="s">22 авг:</span> Предел жары (Чушу)</div>
-    </div>
-</div>
-            <!-- СЕНТЯБРЬ 2027 (1 сентября — Среда) -->
-            <div class="month-card">
-    <div class="month-title">Сентябрь 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-            <td><div class="day-cell">2</div></td>
-            <td><div class="day-cell">3</div></td>
-            <td><div class="day-cell">4</div></td>
-            <td><div class="day-cell">5</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell season" data-title="7 сентября: Белая роса (Байлу)">7</div></td>
-            <td><div class="day-cell">8</div></td>
-            <td><div class="day-cell">9</div></td>
-            <td><div class="day-cell">10</div></td>
-            <td><div class="day-cell">11</div></td>
-            <td><div class="day-cell">12</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell holiday" data-title="15 сентября: Праздник Середины Осени (Чжунцюцзе)">15</div></td>
-            <td><div class="day-cell">16</div></td>
-            <td><div class="day-cell">17</div></td>
-            <td><div class="day-cell">18</div></td>
-            <td><div class="day-cell">19</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">20</div></td>
-            <td><div class="day-cell">21</div></td>
-            <td><div class="day-cell season" data-title="22 сентября: День осеннего равноденствия (Цюфэнь)">22</div></td>
-            <td><div class="day-cell">23</div></td>
-            <td><div class="day-cell">24</div></td>
-            <td><div class="day-cell">25</div></td>
-            <td><div class="day-cell">26</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-            <td><div class="day-cell">30</div></td>
-            <td colspan="3"></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="s">7 сен:</span> Белая роса (Байлу)</div>
-        <div><span class="h">15 сен:</span> Праздник Середины Осени</div>
-        <div><span class="s">22 сен:</span> Осеннее равноденствие</div>
-    </div>
-</div>
-
-            <!-- ОКТЯБРЬ 2027 (1 октября — Пятница) -->
-            <div class="month-card">
-    <div class="month-title">Октябрь 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td><td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-            <td><div class="day-cell">2</div></td>
-            <td><div class="day-cell">3</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">4</div></td>
-            <td><div class="day-cell">5</div></td>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell">7</div></td>
-            <td><div class="day-cell season" data-title="8 октября: Холодные росы (Ханьлу)">8</div></td>
-            <td><div class="day-cell">9</div></td>
-            <td><div class="day-cell">10</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">11</div></td>
-            <td><div class="day-cell">12</div></td>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell">15</div></td>
-            <td><div class="day-cell">16</div></td>
-            <td><div class="day-cell">17</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">18</div></td>
-            <td><div class="day-cell">19</div></td>
-            <td><div class="day-cell">20</div></td>
-            <td><div class="day-cell">21</div></td>
-            <td><div class="day-cell">22</div></td>
-            <td><div class="day-cell season" data-title="23 октября: Выпадение инея (Шуанцзян)">23</div></td>
-            <td><div class="day-cell">24</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">25</div></td>
-            <td><div class="day-cell">26</div></td>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-            <td><div class="day-cell">30</div></td>
-            <td><div class="day-cell">31</div></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="s">8 окт:</span> Холодные росы (Ханьлу)</div>
-        <div><span class="s">23 окт:</span> Выпадение инея (Шуанцзян)</div>
-    </div>
-</div>
-
-            <!-- НОЯБРЬ 2027 (1 ноября — Понедельник) -->
-            <div class="month-card">
-                <div class="month-title">Ноябрь 2027</div>
-                <table class="month-table">
-                    <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-                    <tr>
-                        <td><div class="day-cell">1</div></td>
-                        <td><div class="day-cell">2</div></td>
-                        <td><div class="day-cell">3</div></td>
-                        <td><div class="day-cell">4</div></td>
-                        <td><div class="day-cell">5</div></td>
-                        <td><div class="day-cell">6</div></td>
-                        <td><div class="day-cell season" data-title="7 ноября: Начало зимы (Лидун)">7</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">8</div></td>
-                        <td><div class="day-cell">9</div></td>
-                        <td><div class="day-cell">10</div></td>
-                        <td><div class="day-cell">11</div></td>
-                        <td><div class="day-cell">12</div></td>
-                        <td><div class="day-cell">13</div></td>
-                        <td><div class="day-cell">14</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">15</div></td>
-                        <td><div class="day-cell">16</div></td>
-                        <td><div class="day-cell">17</div></td>
-                        <td><div class="day-cell">18</div></td>
-                        <td><div class="day-cell">19</div></td>
-                        <td><div class="day-cell">20</div></td>
-                        <td><div class="day-cell">21</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell season" data-title="22 ноября: Малые снега (Сяосюэ)">22</div></td>
-                        <td><div class="day-cell">23</div></td>
-                        <td><div class="day-cell">24</div></td>
-                        <td><div class="day-cell">25</div></td>
-                        <td><div class="day-cell">26</div></td>
-                        <td><div class="day-cell">27</div></td>
-                        <td><div class="day-cell">28</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="day-cell">29</div></td>
-                        <td><div class="day-cell">30</div></td>
-                        <td colspan="5"></td>
-                    </tr>
-                </table>
-                <div class="month-events-list">
-                    <div><span class="s">7 ноя:</span> Начало зимы (Лидун)</div>
-                    <div><span class="s">22 ноя:</span> Малые снега (Сяосюэ)</div>
-                </div>
-            </div>
-            <!-- ДЕКАБРЬ 2027 (1 декабря — Среда) -->
-           <div class="month-card">
-    <div class="month-title">Декабрь 2027</div>
-    <table class="month-table">
-        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
-        <tr>
-            <td></td><td></td>
-            <td><div class="day-cell">1</div></td>
-            <td><div class="day-cell">2</div></td>
-            <td><div class="day-cell">3</div></td>
-            <td><div class="day-cell">4</div></td>
-            <td><div class="day-cell">5</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">6</div></td>
-            <td><div class="day-cell season" data-title="7 декабря: Большие снега (Дасюэ)">7</div></td>
-            <td><div class="day-cell">8</div></td>
-            <td><div class="day-cell">9</div></td>
-            <td><div class="day-cell">10</div></td>
-            <td><div class="day-cell">11</div></td>
-            <td><div class="day-cell">12</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">13</div></td>
-            <td><div class="day-cell">14</div></td>
-            <td><div class="day-cell">15</div></td>
-            <td><div class="day-cell">16</div></td>
-            <td><div class="day-cell">17</div></td>
-            <td><div class="day-cell">18</div></td>
-            <td><div class="day-cell">19</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">20</div></td>
-            <td><div class="day-cell holiday" data-title="21 декабря: День зимнего солнцестояния (Дунчжи)">21</div></td>
-            <td><div class="day-cell">22</div></td>
-            <td><div class="day-cell">23</div></td>
-            <td><div class="day-cell">24</div></td>
-            <td><div class="day-cell">25</div></td>
-            <td><div class="day-cell">26</div></td>
-        </tr>
-        <tr>
-            <td><div class="day-cell">27</div></td>
-            <td><div class="day-cell">28</div></td>
-            <td><div class="day-cell">29</div></td>
-            <td><div class="day-cell">30</div></td>
-            <td><div class="day-cell">31</div></td>
-            <td colspan="2"></td>
-        </tr>
-    </table>
-    <div class="month-events-list">
-        <div><span class="s">7 дек:</span> Большие снега (Дасюэ)</div>
-        <div><span class="h">21 дек:</span> Зимнее солнцестояние (Дунчжи)</div>
-    </div>
-</div>
-
+            <div class="m-meta" id="mMeta"></div>
+            <div class="m-body" id="mBody"></div>
         </div>
     </div>
 
+<script>
+(() => {
+'use strict';
+
+/* ==DATA== */
+const YEAR = 2027;
+
+const MONTHS_NOM = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONTHS_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const WEEKDAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+ 
+// 12 дней Цзянь Чу. Оттенок (h) считается автоматически: 12 цветов по кругу.
+const JC = [
+    { zh: '建', py: 'Цзянь', ru: 'Основание' },
+    { zh: '除', py: 'Чу',    ru: 'Удаление' },
+    { zh: '满', py: 'Мань',  ru: 'Полнота' },
+    { zh: '平', py: 'Пин',   ru: 'Равновесие' },
+    { zh: '定', py: 'Дин',   ru: 'Определённость' },
+    { zh: '执', py: 'Чжи',   ru: 'Удержание' },
+    { zh: '破', py: 'По',    ru: 'Разрушение' },
+    { zh: '危', py: 'Вэй',   ru: 'Опасность' },
+    { zh: '成', py: 'Чэн',   ru: 'Завершение' },
+    { zh: '收', py: 'Шоу',   ru: 'Сбор урожая' },
+    { zh: '开', py: 'Кай',   ru: 'Открытие' },
+    { zh: '闭', py: 'Би',    ru: 'Закрытие' }
+];
+
+JC.forEach((j, i) => { j.h = Math.round(15 + i * 29); });
+ 
+// 24 сезона. Четвёртое число — ветвь месяца (子=0 … 亥=11) для «цзе»-сезонов, начинающих месяц.
+const TERMS = [
+    ['2027-01-05', 'Малые холода',          'Сяохань',  1],
+    ['2027-01-20', 'Большие холода',        'Дахань',   null],
+    ['2027-02-04', 'Начало весны',          'Личунь',   2],
+    ['2027-02-19', 'Дождевая вода',         'Юйшуй',    null],
+    ['2027-03-06', 'Пробуждение насекомых', 'Цзинчжэ',  3],
+    ['2027-03-21', 'Весеннее равноденствие','Чуньфэнь', null],
+    ['2027-04-05', 'Чистая ясность',        'Цинмин',   4],
+    ['2027-04-20', 'Хлебные дожди',         'Гуюй',     null],
+    ['2027-05-06', 'Начало лета',           'Лися',     5],
+    ['2027-05-21', 'Малые зерна',           'Сяомань',  null],
+    ['2027-06-06', 'Семена на полях',       'Манчжун',  6],
+    ['2027-06-21', 'Летнее солнцестояние',  'Сячжи',    null],
+    ['2027-07-07', 'Малая жара',            'Сяошу',    7],
+    ['2027-07-23', 'Большая жара',          'Дашу',     null],
+    ['2027-08-08', 'Начало осени',          'Лицю',     8],
+    ['2027-08-23', 'Предел жары',           'Чушу',     null],
+    ['2027-09-08', 'Белая роса',            'Байлу',    9],
+    ['2027-09-23', 'Осеннее равноденствие', 'Цюфэнь',   null],
+    ['2027-10-08', 'Холодные росы',         'Ханьлу',   10],
+    ['2027-10-23', 'Выпадение инея',        'Шуанцзян', null],
+    ['2027-11-07', 'Начало зимы',           'Лидун',    11],
+    ['2027-11-22', 'Малые снега',           'Сяосюэ',   null],
+    ['2027-12-07', 'Большие снега',         'Дасюэ',    0],
+    ['2027-12-22', 'Зимнее солнцестояние',  'Дунчжи',   null]
+].map(([date, ru, py, mb]) => ({ date, ru, py, mb }));
+ 
+const HOLIDAYS = {
+    '2027-02-06': {
+        zh: '春节',
+        title: 'Праздник Весны (Чуньцзе)',
+        when: '1-й день 1-го лунного месяца',
+        text: [
+            'Китайский Новый год — главный праздник традиционного календаря. Он приходится на второе новолуние после зимнего солнцестояния и открывает новый лунный год. В 2027 году начинается год Огненной Овцы (Козы, 丁未).',
+            'Празднование длится 15 дней и завершается Праздником фонарей.'
+        ],
+        traditions: [
+            'Генеральная уборка дома перед праздником — чтобы «вымести» старые неудачи',
+            'Семейный ужин в новогоднюю ночь',
+            'Красные конверты хунбао, красные фонари и парные надписи на дверях',
+            'Фейерверки и хлопушки, визиты к родным и друзьям'
+        ],
+        note: 'В системе Ба Цзы год меняется раньше — в день Личунь (4 февраля), а не в лунный Новый год.'
+    },
+    '2027-04-05': {
+        zh: '清明节',
+        title: 'Праздник Цинмин',
+        when: 'Совпадает с сезоном «Чистая ясность»',
+        text: [
+            'День поминовения предков и ухода за могилами. Он совпадает с одноимённым солнечным сезоном, когда природа оживает, а воздух становится тёплым и прозрачным.',
+            'В основе праздника — древний обычай Холодной пищи (Ханьши), связанный по преданию с памятью о советнике Цзе Цзытуе.'
+        ],
+        traditions: [
+            'Уборка могил и поминальные подношения',
+            'Благовония и ритуальные бумажные деньги',
+            'Весенние прогулки на природу и запуск воздушных змеев',
+            'Зелёные рисовые шарики цинтуань'
+        ]
+    },
+    '2027-06-09': {
+        zh: '端午节',
+        title: 'Праздник Дуаньу (Драконьи лодки)',
+        when: '5-й день 5-го лунного месяца',
+        text: [
+            'Праздник Драконьих лодок посвящён памяти поэта и сановника Цюй Юаня (царство Чу, IV–III века до н. э.), который, по преданию, бросился в реку Мило, узнав о падении своего царства.',
+            'Это начало разгара лета, когда, по народным представлениям, особенно важно защититься от болезней и злых сил.'
+        ],
+        traditions: [
+            'Гонки на драконьих лодках',
+            'Цзунцзы — клейкий рис с начинкой в листьях бамбука или тростника',
+            'Полынь и аир над дверью, мешочки-саше с травами',
+            'Вино с реальгаром (сюнхуан) как оберег'
+        ]
+    },
+    '2027-09-15': {
+        zh: '中秋节',
+        title: 'Праздник Середины Осени (Чжунцюцзе)',
+        when: '15-й день 8-го лунного месяца',
+        text: [
+            'Праздник луны, один из самых тёплых семейных праздников Китая. В эту ночь луна считается самой полной и яркой — она символизирует единство и воссоединение семьи.',
+            'С праздником связана легенда о Чан Э, которая выпила эликсир бессмертия и улетела на луну, и о её муже — стрелке И.'
+        ],
+        traditions: [
+            'Лунные пряники юэбин',
+            'Любование полной луной',
+            'Семейный ужин и фонарики',
+            'Подношения луне'
+        ]
+    },
+    '2027-12-22': {
+        zh: '冬至',
+        title: 'Праздник Зимнего солнцестояния (Дунчжи)',
+        when: 'Совпадает с сезоном «Зимнее солнцестояние»',
+        text: [
+            'Самый короткий день года: инь достигает максимума, и с этого дня начинает возвращаться ян — световой день снова растёт.',
+            'В древности этот день был важнее Нового года; говорили: «Дунчжи велик, как Новый год». Императоры приносили в этот день жертвы Небу.'
+        ],
+        traditions: [
+            'Танъюань — клёцки из клейкого риса (на юге Китая)',
+            'Цзяоцзы — пельмени (на севере Китая)',
+            'Семейные застолья и поминание предков',
+            'Начало «счёта девяток» (шуцзю) — девять раз по девять дней до тепла'
+        ]
+    }
+};
+
+const JC_INFO = [
+    { essence: 'День начала: энергия набирает ход, хорошее время закладывать основу.',
+      good: ['Начинать новые дела и проекты', 'Знакомиться, налаживать связи, вступать в должность', 'Отправляться в дорогу'],
+      bad:  ['Земляные работы и закладка фундамента', 'Вскрывать хранилища и тратить запасы', 'Похороны'] },
+    { essence: 'День очищения: уходит старое, лишнее и застоявшееся.',
+      good: ['Уборка и избавление от ненужных вещей', 'Гигиенические и оздоровительные процедуры', 'Завершать старые дела и закрывать долги'],
+      bad:  ['Свадьбы и помолвки', 'Вступать в новую должность', 'Начинать крупные проекты'] },
+    { essence: 'День полноты: всего в избытке, время плодов, встреч и праздников.',
+      good: ['Праздники и семейные торжества', 'Открытие дела, въезд в новый дом', 'Получать прибыль и подводить итоги'],
+      bad:  ['Земляные работы', 'Похороны', 'Посадка растений'] },
+    { essence: 'День равновесия: спокойный, ровный, без резких поворотов.',
+      good: ['Плановая работа и ремонт', 'Благоустройство, приведение дел в порядок', 'Спокойные переговоры и примирения'],
+      bad:  ['Рискованные начинания', 'Рытьё каналов и колодцев', 'Резкие перемены'] },
+    { essence: 'День определённости: решения закрепляются и вступают в силу.',
+      good: ['Подписывать договоры и соглашения', 'Помолвки, свадьбы, начало учёбы', 'Принимать окончательные решения'],
+      bad:  ['Судебные тяжбы и споры', 'Дальние поездки', 'Посадка растений'] },
+    { essence: 'День удержания: время закрепить результат и довести начатое до конца.',
+      good: ['Завершать и закреплять достигнутое', 'Ритуалы, благодарственные подношения', 'Наводить порядок в делах и документах'],
+      bad:  ['Переезд', 'Открытие бизнеса', 'Начало дальних поездок'] },
+    { essence: 'День разрушения: самый «ломающий» день цикла, напряжённый и конфликтный.',
+      good: ['Снос и демонтаж, избавление от хлама', 'Рвать с тем, что давно изжило себя'],
+      bad:  ['Свадьбы и помолвки', 'Открытие дела и подписание договоров', 'Поездки и важные начинания'] },
+    { essence: 'День опасности: требует осторожности и трезвой оценки рисков.',
+      good: ['Тихие домашние дела, отдых', 'Подготовка и планирование', 'Ритуалы и молитвы'],
+      bad:  ['Рискованные поступки и экстрим', 'Восхождения, плавание', 'Крупные сделки'] },
+    { essence: 'День завершения: дела доводятся до успеха, итоги радуют.',
+      good: ['Открытие дела, подписание договоров', 'Свадьбы и торжества', 'Переезд, начало учёбы'],
+      bad:  ['Судебные тяжбы', 'Похороны'] },
+    { essence: 'День сбора: время получать то, что посеяно.',
+      good: ['Собирать долги и платежи', 'Получать прибыль, подводить итоги', 'Уборка урожая, запасы'],
+      bad:  ['Дальние поездки', 'Крупные траты и выдача в долг', 'Похороны и земляные работы'] },
+    { essence: 'День открытия: путь свободен, двери открыты.',
+      good: ['Открытие бизнеса, запуск проектов', 'Начало учёбы или работы', 'Поездки и свадьбы'],
+      bad:  ['Похороны', 'Земляные работы'] },
+    { essence: 'День закрытия: энергия замыкается, время завершать и откладывать.',
+      good: ['Закрывать дела, подводить черту', 'Хранить, откладывать, делать запасы', 'Ремонт и укрепление'],
+      bad:  ['Открытие дела и новые проекты', 'Поездки и свадьбы', 'Вскрывать то, что должно оставаться закрытым'] }
+];
+
+/* ==COMPUTE== */
+// Ветвь месяца → ветвь «месячного Ша» (丑=1, 辰=4, 未=7, 戌=10)
+const SHA_BRANCH = [7, 4, 1, 10, 7, 4, 1, 10, 7, 4, 1, 10];
+ 
+function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+ 
+// Для каждого дня: jc — индекс дежурного (0…11), sha — день Ша.
+function computeDays() {
+    const jie = {};
+    TERMS.forEach(t => { if (t.mb !== null) jie[t.date] = t.mb; });
+    const out = {};
+    let mb = 0; // до 5 января — месяц 子 (Дасюэ прошлого года)
+    for (let m = 0; m < 12; m++) {
+        for (let d = 1; d <= daysInMonth(YEAR, m); d++) {
+            const key = YEAR + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+            if (key in jie) mb = jie[key];
+            const jdn = Math.floor(Date.UTC(YEAR, m, d) / 86400000) + 2440588;
+            const br = (((jdn - 2451551) % 12) + 12) % 12; // 2000-01-07 — день цзы-цзя (子)
+            out[key] = { jc: (((br - mb) % 12) + 12) % 12, sha: br === SHA_BRANCH[mb] };
+        }
+    }
+    return out;
+}
+/* ==END== */
+ 
+const DAYS = computeDays();
+const TERM_BY_DATE = {};
+TERMS.forEach(t => { TERM_BY_DATE[t.date] = t; });
+ 
+const jcColor = i => 'hsl(' + JC[i].h + ' 70% 58%)';
+const pad = n => String(n).padStart(2, '0');
+const keyOf = (m, d) => YEAR + '-' + pad(m + 1) + '-' + pad(d);
+ 
+const state = { season: true, holiday: true, sha: true, jc: true };
+ 
+const monthsEl = document.getElementById('months');
+const jcLegend = document.getElementById('jcLegend');
+const tip = document.getElementById('tip');
+const modal = document.getElementById('modal');
+const mClose = document.getElementById('mClose');
+ 
+/* ───────── Легенда: 12 индикаторов Цзянь Чу ───────── */
+document.getElementById('jcGrid').innerHTML = JC.map((j, i) =>
+    '<div class="jc-chip" style="--jh:' + j.h + '"><span class="jc-sw"></span>' +
+    '<span><b>' + j.zh + '</b> ' + j.py + ' <small>' + j.ru + '</small></span></div>'
+).join('');
+ 
+document.getElementById('jcBox').style.setProperty('--bg',
+    'linear-gradient(135deg,' + JC.map((j, i) => jcColor(i)).join(',') + ')');
+ 
+/* ───────── Построение месяцев ───────── */
+function buildMonth(m) {
+    const first = (new Date(YEAR, m, 1).getDay() + 6) % 7; // понедельник = 0
+    const total = daysInMonth(YEAR, m);
+    const cells = [];
+    for (let i = 0; i < first; i++) cells.push('<td></td>');
+    for (let d = 1; d <= total; d++) {
+        const key = keyOf(m, d);
+        const info = DAYS[key];
+        let cls = 'day-cell';
+        if (TERM_BY_DATE[key]) cls += ' has-season';
+        if (HOLIDAYS[key]) cls += ' has-holiday';
+        if (info.sha) cls += ' has-sha';
+        cells.push(
+            '<td><div class="' + cls + '" data-date="' + key + '" data-jc="' + info.jc +
+            '" style="--jh:' + JC[info.jc].h + '"><span class="num">' + d +
+            '</span><i class="mk mk-h">★</i><i class="mk mk-sha"></i></div></td>'
+        );
+    }
+    while (cells.length % 7) cells.push('<td></td>');
+    let rows = '';
+    for (let i = 0; i < cells.length; i += 7) rows += '<tr>' + cells.slice(i, i + 7).join('') + '</tr>';
+ 
+    // подписи под месяцем
+    const ev = [];
+    const prefix = YEAR + '-' + pad(m + 1) + '-';
+    TERMS.filter(t => t.date.startsWith(prefix)).forEach(t => {
+        ev.push('<div class="ev ev-season" data-g="season"><span>' + Number(t.date.slice(8)) + ' ' + MONTHS_SHORT[m] +
+                ':</span> ' + t.ru + ' (' + t.py + ')</div>');
+    });
+    Object.keys(HOLIDAYS).filter(k => k.startsWith(prefix)).forEach(k => {
+        ev.push('<div class="ev ev-holiday" data-g="holiday"><span>' + Number(k.slice(8)) + ' ' + MONTHS_SHORT[m] +
+                ':</span> ' + HOLIDAYS[k].title + '</div>');
+    });
+    const sha = [];
+    for (let d = 1; d <= total; d++) if (DAYS[keyOf(m, d)].sha) sha.push(d);
+    if (sha.length) {
+        ev.push('<div class="ev ev-sha" data-g="sha"><span>Дни Ша:</span> ' + sha.join(', ') + ' ' + MONTHS_SHORT[m] + '</div>');
+    }
+
+    return '<div class="month-card"><div class="month-title">' + MONTHS_NOM[m] + ' ' + YEAR + '</div>' +
+        '<table class="month-table"><tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>' +
+        rows + '</table><div class="month-events-list">' + ev.join('') + '</div></div>';
+}
+monthsEl.innerHTML = MONTHS_NOM.map((_, m) => buildMonth(m)).join('');
+ 
+/* ───────── Применение фильтров ───────── */
+function applyState() {
+    Object.keys(state).forEach(k => monthsEl.classList.toggle('show-' + k, state[k]));
+    jcLegend.classList.toggle('off', !state.jc);
+ 
+    monthsEl.querySelectorAll('.month-events-list').forEach(list => {
+        let any = false;
+        list.querySelectorAll('.ev').forEach(ev => {
+            const on = state[ev.dataset.g];
+            ev.style.display = on ? '' : 'none';
+            if (on) any = true;
+        });
+        list.hidden = !any;
+    });
+ 
+    monthsEl.querySelectorAll('.day-cell.has-holiday').forEach(c => {
+        if (state.holiday) {
+            c.setAttribute('tabindex', '0');
+            c.setAttribute('role', 'button');
+            c.setAttribute('aria-label', HOLIDAYS[c.dataset.date].title + ' — открыть описание');
+        } else {
+            c.removeAttribute('tabindex');
+            c.removeAttribute('role');
+            c.removeAttribute('aria-label');
+        }
+    });
+    hideTip();
+}
+ 
+document.getElementById('legend').addEventListener('change', e => {
+    const layer = e.target && e.target.dataset && e.target.dataset.layer;
+    if (!layer) return;
+    state[layer] = e.target.checked;
+    applyState();
+});
+
+/* ───────── Подсказка ───────── */
+function dateLabel(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return d + ' ' + MONTHS_GEN[m - 1] + ' ' + y + ', ' + WEEKDAYS[new Date(y, m - 1, d).getDay()];
+}
+ 
+function tipLines(key) {
+    const info = DAYS[key];
+    const lines = [];
+    if (state.jc) {
+        const j = JC[info.jc];
+        lines.push('<span class="t-dot" style="background:' + jcColor(info.jc) + '"></span><span>' +
+                   j.py + ' (' + j.zh + ') — ' + j.ru + '</span>');
+    }
+    if (state.season && TERM_BY_DATE[key]) {
+        const t = TERM_BY_DATE[key];
+        lines.push('<span class="t-dot" style="background:var(--cal-season)"></span><span>' + t.ru + ' (' + t.py + ')</span>');
+    }
+
+    if (state.holiday && HOLIDAYS[key]) {
+        lines.push('<span class="t-dot" style="background:var(--cal-holiday)"></span><span>' + HOLIDAYS[key].title + '</span>');
+    }
+    if (state.sha && info.sha) {
+        lines.push('<span class="t-dot" style="background:var(--cal-sha)"></span><span>День Ша</span>');
+    }
+    return lines;
+}
+ 
+function showTip(cell) {
+    const key = cell.dataset.date;
+    const lines = tipLines(key);
+    if (!lines.length) { hideTip(); return; }
+    tip.innerHTML = '<div class="t-head">' + dateLabel(key) + '</div>' +
+        lines.map(l => '<div class="t-line">' + l + '</div>').join('');
+    tip.style.left = '0px';
+    tip.style.top = '0px';
+    const r = cell.getBoundingClientRect();
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    let top = r.top - th - 8;
+    if (top < 8) top = r.bottom + 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.classList.add('on');
+}
+function hideTip() { tip.classList.remove('on'); }
+ 
+const touchOnly = window.matchMedia('(hover: none)').matches;
+ 
+monthsEl.addEventListener('mouseover', e => {
+    if (touchOnly) return;
+    const cell = e.target.closest('.day-cell');
+    if (cell) showTip(cell); else hideTip();
+});
+monthsEl.addEventListener('mouseleave', hideTip);
+monthsEl.addEventListener('focusin', e => {
+    const cell = e.target.closest('.day-cell');
+    if (cell) showTip(cell);
+});
+monthsEl.addEventListener('focusout', hideTip);
+window.addEventListener('scroll', hideTip, { passive: true });
+ 
+/* ───────── Окно праздника ───────── */
+let lastFocus = null;
+ 
+function jcBlock(info, withTitle) {
+    const j = JC[info.jc], d = JC_INFO[info.jc];
+    return (withTitle ? '<h3>День ' + j.py + ' (' + j.zh + ') — ' + j.ru + '</h3>' : '') +
+        '<p>' + d.essence + '</p>' +
+        '<h3 class="good">Благоприятно</h3><ul class="good">' + d.good.map(t => '<li>' + t + '</li>').join('') + '</ul>' +
+        '<h3 class="bad">Лучше воздержаться</h3><ul class="bad">' + d.bad.map(t => '<li>' + t + '</li>').join('') + '</ul>';
+}
+
+function openModal(key, cell) {
+    const h = state.holiday ? HOLIDAYS[key] : null;
+    const info = DAYS[key];
+    const j = JC[info.jc];
+    lastFocus = cell;
+
+    document.getElementById('mZh').textContent = h ? h.zh : j.zh;
+    document.getElementById('mTitle').textContent = h ? h.title : 'День ' + j.py + ' — ' + j.ru;
+    document.getElementById('mDate').textContent = dateLabel(key);
+
+    let meta = '';
+    if (h) meta += '<span class="m-chip gold">' + h.when + '</span>';
+    if (h && state.jc) {
+        meta += '<span class="m-chip"><span class="t-dot" style="background:' + jcColor(info.jc) + '"></span>День ' +
+                j.py + ' (' + j.zh + ')</span>';
+    }
+    if (!h && state.season && TERM_BY_DATE[key]) {
+        meta += '<span class="m-chip"><span class="t-dot" style="background:var(--cal-season)"></span>Сезон: ' +
+                TERM_BY_DATE[key].py + '</span>';
+    }
+    if (state.sha && info.sha) meta += '<span class="m-chip sha">День Ша</span>';
+    document.getElementById('mMeta').innerHTML = meta;
+
+    let body = '';
+    if (h) {
+        body += h.text.map(p => '<p>' + p + '</p>').join('') +
+            '<h3>Традиции</h3><ul>' + h.traditions.map(t => '<li>' + t + '</li>').join('') + '</ul>' +
+            (h.note ? '<p class="m-note">' + h.note + '</p>' : '');
+        if (state.jc) body += jcBlock(info, true);
+    } else {
+        body += jcBlock(info, false);
+    }
+    if (state.jc) {
+        body += '<p class="m-note">Это традиционные рекомендации китайского календаря, а не строгие правила.' +
+                (state.sha && info.sha ? ' Сегодня ещё и день Ша: с важными начинаниями лучше повременить.' : '') + '</p>';
+    }
+    document.getElementById('mBody').innerHTML = body;
+
+    hideTip();
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    mClose.focus();
+}
+
+function closeModal() {
+    if (modal.hidden) return;
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+}
+
+monthsEl.addEventListener('click', e => {
+    const cell = e.target.closest('.day-cell');
+    if (!cell) return;
+    const isHoliday = state.holiday && cell.classList.contains('has-holiday');
+    if (isHoliday || state.jc) {
+        openModal(cell.dataset.date, cell);
+    } else if (touchOnly) {
+        showTip(cell);
+        e.stopPropagation();
+    }
+});
+
+monthsEl.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const cell = e.target.closest('.day-cell.has-holiday');
+    if (cell && state.holiday) {
+        e.preventDefault();
+        openModal(cell.dataset.date, cell);
+    }
+});
+document.addEventListener('click', e => {
+    if (touchOnly && !e.target.closest('.day-cell')) hideTip();
+});
+
+mClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => {
+    if (modal.hidden) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'Tab') { e.preventDefault(); mClose.focus(); }
+});
+ 
+applyState();
+})();
+</script>
 </body>
 </html>

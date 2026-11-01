@@ -65,6 +65,46 @@
 
     <script src="script.js"></script>
     <script src="segodnya-widget.js"></script>
+    <style>
+  .starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .starfield .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+    animation: star-twinkle var(--d, 5s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .starfield .star.gold { background: #f3e5ab; }
+  .starfield .star.glow { box-shadow: 0 0 6px 1px rgba(243, 229, 171, 0.55); }
+  @keyframes star-twinkle {
+    0%, 100% { opacity: 0;           transform: scale(0.6); }
+    50%      { opacity: var(--o, .6); transform: scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .starfield .star { animation: none; opacity: 0.3; }
+  }
+</style>
+<script>
+(function () {
+  var box = document.createElement('div');
+  box.className = 'starfield';
+  box.setAttribute('aria-hidden', 'true');
+  var count = window.innerWidth < 700 ? 45 : 95;
+  for (var i = 0; i < count; i++) {
+    var s = document.createElement('span');
+    var size = 1 + Math.random() * 2;
+    s.className = 'star' + (Math.random() < 0.3 ? ' gold' : '') + (size > 2.4 ? ' glow' : '');
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top = (Math.random() * 100) + '%';
+    s.style.width = s.style.height = size + 'px';
+    s.style.setProperty('--d', (3 + Math.random() * 5).toFixed(1) + 's');
+    s.style.setProperty('--delay', (-Math.random() * 8).toFixed(1) + 's');
+    s.style.setProperty('--o', (0.35 + Math.random() * 0.5).toFixed(2));
+    box.appendChild(s);
+  }
+  document.body.appendChild(box);
+})();
+</script>
     
 </body>
 </html>

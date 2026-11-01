@@ -328,3 +328,5 @@ body, html {
         background: rgba(34, 53, 76, 0.92);
     }
 }
+
+body {background: transparent;}
